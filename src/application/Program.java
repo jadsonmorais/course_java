@@ -1,45 +1,59 @@
 package application;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Scanner;
+
+import entities.Department;
+import entities.HourContract;
+import entities.Worker;
+import entities.enums.WorkerLevel;
 
 public class Program {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
 
+		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
-
-		int m = sc.nextInt();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		
+		System.out.print("Enter department's name: ");
+		String departmentName = sc.nextLine();
+		System.out.println("Enter worker data:");
+		System.out.print("Name: ");
+		String workerName = sc.nextLine();
+		System.out.print("Level: ");
+		String workerLevel = sc.nextLine();
+		System.out.print("Base salary: ");
+		Double baseSalary = sc.nextDouble();
+		Worker worker = new Worker(workerName, WorkerLevel.valueOf(workerLevel), baseSalary, new Department(departmentName));
+		
+		System.out.print("How many contracts to this worker? ");
 		int n = sc.nextInt();
-		int[][] mat = new int[m][n];
-
-		for (int i = 0; i < mat.length; i++) {
-			for (int j = 0; j < mat[i].length; j++) {
-				mat[i][j] = sc.nextInt();
-			}
+		
+		for (int i=1; i<=n; i++) {
+			System.out.println("Enter contract #" + i + " data:");
+			System.out.print("Date (DD/MM/YYYY): ");
+			Date contractDate = sdf.parse(sc.next());
+			System.out.print("Value per hour: ");
+			double valuePerHour = sc.nextDouble();
+			System.out.print("Duration (hours): ");
+			int hours = sc.nextInt();
+			HourContract contract = new HourContract(contractDate, valuePerHour, hours);
+			worker.addContract(contract);
 		}
-
-		int x = sc.nextInt();
-
-		for (int i = 0; i < mat.length; i++) {
-			for (int j = 0; j < mat[i].length; j++) {
-				if (mat[i][j] == x) {
-					System.out.println("Position " + i + "," + j + ":");
-					if (j > 0) {
-						System.out.println("Left: " + mat[i][j - 1]);
-					}
-					if (i > 0) {
-						System.out.println("Up: " + mat[i - 1][j]);
-					}
-					if (j < mat[i].length - 1) {
-						System.out.println("Right: " + mat[i][j + 1]);
-					}
-					if (i < mat.length - 1) {
-						System.out.println("Down: " + mat[i + 1][j]);
-					}
-				}
-			}
-		}
-
+		
+		System.out.println();
+		System.out.print("Enter month and year to calculate income (MM/YYYY): ");
+		String monthAndYear = sc.next();
+		int month = Integer.parseInt(monthAndYear.substring(0, 2));
+		int year = Integer.parseInt(monthAndYear.substring(3));
+		System.out.println("Name: " + worker.getName());
+		System.out.println("Department: " + worker.getDepartment().getName());
+		System.out.println("Income for " + monthAndYear + ": " + String.format("%.2f", worker.income(year, month)));
+		
 		sc.close();
 	}
 }
